@@ -1,0 +1,26 @@
+{
+  "title": "「Python実践データ分析100本ノック 第2版」を解き進めた際のメモ",
+  "closed": false,
+  "archived": false,
+  "created_at": "2024-08-24",
+  "comments": [
+    {
+      "author": "konan",
+      "created_at": "2024-08-24",
+      "body_markdown": "## 朝練\n* Google Colaboratoryが便利、、\n* Google Drive内のデータへのアクセスが楽だな\n* しかもGeminiがあるからほとんど補完してくれる\n* 本書はサンプルプログラムも備わっていて初速が速くなるのは勉強を始めるのに良い",
+      "body_updated_at": "2024-08-24"
+    },
+    {
+      "author": "konan",
+      "created_at": "2024-08-24",
+      "body_markdown": "## 第1部\n### 第1章\n* まずはデータの全体像を把握する。主軸となるデータは最も粒度が細かいデータになる。\n\n### 第2章\n* [`bool`のリストによるマスク（ブーリアンインデックス）](https://note.nkmk.me/python-pandas-at-iat-loc-iloc/#:~:text=source%3A%20pandas_get_set_data.py-,bool%E3%81%AE%E3%83%AA%E3%82%B9%E3%83%88%E3%81%AB%E3%82%88%E3%82%8B%E3%83%9E%E3%82%B9%E3%82%AF%EF%BC%88%E3%83%96%E3%83%BC%E3%83%AA%E3%82%A2%E3%83%B3%E3%82%A4%E3%83%B3%E3%83%87%E3%83%83%E3%82%AF%E3%82%B9%EF%BC%89,-loc%2C%20iloc)\n    ```python\n    fig_is_null = uriage_data[\"item_price\"].isnull()\n    uriage_data.loc[~fig_is_null]\n    ```\n    ⇒ これで`uriage_data`から`item_price`が`null`の要素は除れる\n\n* `loc`での特定カラムの抜き出し方法\n    ```python\n    uriage_data.loc[uriage_data[\"item_name\"]==trg][\"item_price\"]\n    uriage_data.loc[uriage_data[\"item_name\"]==trg, \"item_price\"]\n    ```\n    ⇒ 下記は同じ意味だが本書ではどちらも出てくる\n\n### 第3章\n* groupbyをAのように書いてあるがBの方が適切ではないのか？\n  なぜなら集計するカラムを限定させた方がコードとしても分かりやすいし処理も速いのではないか？\n    ```python\n    A: uselog_weekday = uselog.groupby([\"customer_id\", \"年月\", \"weekday\"], as_index=False).count()[[\"customer_id\", \"年月\", \"weekday\", \"log_id\"]]\n    B: uselog_weekday = uselog.groupby([\"customer_id\", \"年月\", \"weekday\"], as_index=False)[\"log_id\"].count()\n    ```\n\n## ※正誤\n###### 第1章 ノック8の3つ目のコード\n```python\n誤：　join_data.groupby(\"payment_month\").sum()[\"price\"]\n正：　join_data.groupby(\"payment_month\")[\"price\"].sum()\n```\n###### 第1章 ノック9の1つ目のコード\n```python\n誤：　join_data.groupby([\"payment_month\",\"item_name\"]).sum()[[\"price\", \"quantity\"]]\n正：　join_data.groupby([\"payment_month\",\"item_name\"])[[\"price\", \"quantity\"]].sum()\n```",
+      "body_updated_at": "2024-09-15"
+    },
+    {
+      "author": "konan",
+      "created_at": "2024-09-02",
+      "body_markdown": "## 第2部\n### 第4章\n* クラスタリング\n    * 重要なポイントは、クラスタリングの結果をそのまま鵜呑みにするのではなく、各クラスタの特徴を解釈し、理解するための追加の分析や専門知識が必要であるということです。\n    * クラスタリングはデータのパターンを発見するための出発点であり、その結果を適切に解釈し、活用するためには人間の分析と判断が不可欠です。\n* 次元削除\n    * 情報をなるべく失わないように変数を削除して新しい軸を作り出すこと\n    * これにより5つの変数を2つの変数で表現することができ、グラフ化することが可能になる\n    * 次元削除の代表的な指標である主成分分析\n* モデルに寄与する変数の調査\n    * どの変数がどの程度、結果に寄与しているかを出力することができる\n### 第4章\n* ダミー変数化\n    * カテゴリカル変数を`TRUE`と`FALSE`にフラグ化すること\n* 過学習傾向\n    * **学習用データ**の精度の方が、**評価用データ**を用いた予測精度より高くなること\n    * データを増やしたり、変数を見直したり、モデルのパラメーターを変更したり\n## ※正誤\n###### 第3章\n```python\n誤：　uselog_customer = uselog_months.groupby(\"customer_id\").agg([\"mean\", \"median\", \"max\", \"min\" ])[\"count\"]\n正：　uselog_customer = uselog_months.groupby(\"customer_id\")[\"count\"].agg([\"mean\", \"median\", \"max\", \"min\" ])\n```",
+      "body_updated_at": "2024-09-16"
+    }
+  ]
+}

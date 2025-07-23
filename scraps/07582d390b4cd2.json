@@ -1,0 +1,54 @@
+{
+  "title": "InstagramのAPIを使えるようになるまで",
+  "closed": false,
+  "archived": false,
+  "created_at": "2024-08-22",
+  "comments": [
+    {
+      "author": "konan",
+      "created_at": "2024-08-22",
+      "body_markdown": "## [Instagramプラットフォーム](https://developers.facebook.com/docs/instagram-platform)なるものは4種類ある\n* [Instagramログインを使ったInstagram API](https://developers.facebook.com/docs/instagram-platform/instagram-api-with-instagram-login)\n* [Facebookログインを使ったInstagram API](https://developers.facebook.com/docs/instagram-platform/instagram-api-with-facebook-login)\n* Messenger API経由のInstagramメッセージAPI\n* [Instagram基本表示API](https://developers.facebook.com/docs/instagram-basic-display-api)\n\n### それぞれ用途がある\n##### ■ Instagramログインを使ったInstagram API\n    ・ メッセージング - 顧客やInstagramアカウントに興味を持っている人とメッセージを送受信できます。\n    ・ コメントモデレーション - 自社メディアへのコメントを管理し、返信する。\n    ・ コンテンツ公開 - 自社メディアを取得し、公開する\n    ・ メンション - 他のインスタグラムユーザーから@を付けられたメディアを特定する。\n\n##### ■ Facebookログインを使ったInstagram API\n    ・ 公開された写真、動画、ストーリーズの取得と管理\n    ・ ほかのInstagramビジネスアカウントおよびクリエイターアカウントに関する基本データの取得\n    ・ コメントとそれに対する返信のモデレーション\n    ・ メディアおよびプロフィールのインタラクションの測定\n    ・ ハッシュタグの付いたメディアの発見\n    ・ @メンションの発見\n    ・ コンテンツパブリッシング\n##### ■ Instagram基本表示API\n    ・ InstagramユーザーからInstagramユーザーアクセストークンおよびアクセス許可を取得する\n    ・ Instagramユーザーのプロフィールを取得する\n    ・ Instagramユーザーの画像、動画、アルバムを取得する\n\n### それぞれ制限がある\n##### ■ Instagramログインを使ったInstagram API\n    ・ このAPIセットアップでは、広告、インサイト、タグ付けにアクセスできません。\n##### ■ Facebookログインを使ったInstagram API\n    ・ Facebookログインを使ったInstagram APIでは、Instagram消費者アカウント(ビジネスでもクリエイターでもないInstagramアカウント)にアクセスすることはできません。消費者ユーザー用のアプリを構築している場合は、代わりにInstagram基本表示APIを使用してください。\n    ・ コンテンツパブリッシングは、ビジネスアカウントのみが利用できるストーリーズを除き、すべてのInstagramプロアカウントが利用できます。\n    ・ 結果の並べ替えはサポートされていません\n    ・ カーソルベースのページ割りはすべてのエンドポイントでサポートされていますが、時間ベースのページ割りをサポートするエンドポイントはユーザーインサイトエッジだけです\n##### ■ Instagram基本表示API\n    ・ 認証 — Instagram基本表示は認証ソリューションではありません。APIが返すデータを使用して、アプリユーザーを認証したり、アプリユーザーをアプリにログインさせたりすることはできません。認証ソリューションが必要な場合は、代わりにFacebookログインを使用するようおすすめします。\n    ・ アプリタイプ — ビジネスアプリとして指定されたアプリはサポートされません。アプリがビジネスアプリである場合は、代わりにInstagramグラフAPIを使用するか、ビジネスアプリでない新しいアプリを作成してください。\n    ・ レガシーID — InstagramレガシーAPIユーザーIDはサポートされません。\n    ・ サポートされないメディア — IGTV、ストーリーズ、リール、コメントはサポートされません。\n    ・ 宣伝投稿 — Instagramメディアが含まれている宣伝投稿はサポートされません。\n    ・ インサイト — インサイトはサポートされません。\n\n## 方針\n> メディアおよびプロフィールのインタラクションの測定\n\nを行いたいため **「Facebookログインを使ったInstagram API」** を採用する！！",
+      "body_updated_at": "2024-08-22"
+    },
+    {
+      "author": "konan",
+      "created_at": "2024-08-22",
+      "body_markdown": "## [Getting Started](https://developers.facebook.com/docs/instagram-platform/instagram-api-with-facebook-login/get-started?locale=ja_JP)\n### 目次\n下記のような流れで始められるようになっている\n3まで行けば基本的な準備が完了\n\n    1. Facebookログインを設定する\n    2. Facebookログインを実装する\n    3. ユーザーアクセストークンを取得する\n      ~ ここまでが基本的な準備 ~\n    4. ユーザーのページを取得する\n    5. ページのInstagramビジネスアカウントを取得する\n    6. Instagramビジネスアカウントのメディアオブジェクトを取得する\n\n### 1. Facebookログインを設定する\n* 適宜アプリに製品（`PRODUCTS`）を追加できるためここでは **「Instagram」** を追加する\n\n### 2. Facebookログインを実装する\n### 3. ユーザーアクセストークンを取得する\n* ログイン部分を実装した上でアクセストークンを取得する必要があるみたい\n    * [ビジネス向け Facebook ログイン](https://developers.facebook.com/docs/instagram-platform/instagram-api-with-facebook-login/business-login-for-instagram)このページに詳細が書いてある\n* 他にも **[グラフAPIエクスプローラー](https://developers.facebook.com/tools/explorer/)** でアクセストークンの発行が可能",
+      "body_updated_at": "2024-08-23"
+    },
+    {
+      "author": "konan",
+      "created_at": "2024-08-22",
+      "body_markdown": "### [グラフAPIエクスプローラー](https://developers.facebook.com/tools/explorer/)でアクセストークンを発行してみる\nアクセストークンには「有効期限 1時間」「有効期限 2ヶ月」「無期限」とあり\nログイン部分を実装しなくとも、[グラフAPIエクスプローラー](https://developers.facebook.com/tools/explorer/)から発行することができる\n\n#### ~参考~\n* [Instagram Graph APIを使ってみた(Rails)](https://qiita.com/s_tak/items/de4941ae36cdcdd6cd23#%E3%82%A2%E3%82%AF%E3%82%BB%E3%82%B9%E3%83%88%E3%83%BC%E3%82%AF%E3%83%B3%E5%8F%96%E5%BE%97)",
+      "body_updated_at": "2024-08-26"
+    },
+    {
+      "author": "konan",
+      "created_at": "2024-08-22",
+      "body_markdown": "##### ※データアクセスの有効期限\n    データアクセスの有効期限は、利用者が最後にアクティブであった時点を基準として90日間です。この90日間の有効期限を経過しても、利用者は引き続きアプリにアクセスできます(つまり、認証が維持されています)。\n    しかし、アプリ側から利用者のデータにアクセスすることはできなくなります。データアクセスを再び獲得するには、アプリのアクセス許可を再度利用者に承認してもらう必要があります。\n\nつまりアクティブなアカウントを対象にしていれば問題ない\nhttps://developers.facebook.com/docs/facebook-login/auth-vs-data#data-access-expiration",
+      "body_updated_at": "2024-08-22"
+    },
+    {
+      "author": "konan",
+      "created_at": "2024-08-22",
+      "body_markdown": "##### ※長期トークンの更新\n無期限のアクセストークンを取得していたら不要なのかな？？\nhttps://developers.facebook.com/docs/instagram-platform/instagram-api-with-instagram-login/business-login#get-a-long-lived-access-token"
+    },
+    {
+      "author": "konan",
+      "created_at": "2024-08-23",
+      "body_markdown": "##### ※アクセストークンデバッガー\nアクセストークンの有効期限などが調べられる\nhttps://developers.facebook.com/tools/debug/accesstoken/"
+    },
+    {
+      "author": "konan",
+      "created_at": "2024-08-23",
+      "body_markdown": "### ■ アプリユーザー\n* ロールユーザー　：アプリそのものに役割を持つユーザー\n* 非ロールユーザー：持たないユーザー\n\n### ■ アプリモード\n##### 開発モード\n* 役割があるユーザーのみがアクセス許可をリクエストできる\n* リクエストできるのは標準または詳細アクセスレベルのアクセス許可のみ (消費者アプリのみに適用)\n* 機能は役割があるユーザーのみに対してアクティブ\n* アクティブになるのは標準または詳細アクセスレベルの機能のみ(消費者アプリのみ)\n##### ライブモード\n* すべてのユーザーがアクセス許可をリクエストできる\n* リクエストできるのは、アプリレビューを通じて承認されたアクセス許可のみ\n* アプリユーザーに対してアクティブになるのは、アプリレビューを通じて承認された機能のみ\n\n## 方針\n* 個人ツールであるため **開発モード** で対応\n* 対象のInstagramアカウントに役割（`Instagramテスター`）を付与すればアクセス可能\n",
+      "body_updated_at": "2024-08-26"
+    },
+    {
+      "author": "konan",
+      "created_at": "2024-09-02",
+      "body_markdown": "## 自身以外のInstagramアカウントのユーザーアクセストークンを得るには？？\n> グラフAPIエクスプローラーでアクセストークンを発行してみる\n\nこの方法では自身のFacebookアカウントに紐づくInstagramアカウントしか\n「無期限」のアクセストークンを得ることができない\n\nやはりFacebookログイン部分を実装した上でアクセストークンを取得する必要がある\n※「無期限」のアクセストークンは取得不可",
+      "body_updated_at": "2024-09-08"
+    }
+  ]
+}
