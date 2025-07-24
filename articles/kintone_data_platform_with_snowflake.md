@@ -1,46 +1,40 @@
 ---
-title: "Snowflakeを用いたkintoneデータの分析基盤構築" # 記事のタイトル
+title: "Snowpipe + Stream + Taskでニアリアルタイム分析基盤を構築する" # 記事のタイトル
 emoji: "☃️" # アイキャッチとして使われる絵文字（1文字だけ）
 type: "tech" # tech: 技術記事 / idea: アイデア記事
 topics: ["kintone", "snowflake", "dataengineering", "dwh"] # タグ。["markdown", "rust", "aws"]のように指定する
-published: false # 公開設定（falseにすると下書き）
+published: true # 公開設定（falseにすると下書き）
 ---
 
 ## はじめに
 
-kintoneのデータを可視化・分析したい場合に意外と選択肢が少ない！！
+kintoneのデータを本格的に分析する際の技術選択は意外と難しい。。。
 
-kintone標準のBI機能はシンプルすぎて表現力に欠けるし、BIツール導入を考えると、データベースやETLツールの選定、さらには冪等性・リアルタイム性などクリアすべき要件が次々と出てくる。
+kintone標準のBI機能では物足りない一方で、外部BIツールを導入するには**データの取り込み**、**リアルタイム更新**、**スキーマ変更への対応**など、様々な技術的課題をクリアする必要があります。
 
-そこで今回は、Snowflakeを用いた「標準的な」構成例を整理する。  
-kintoneからSnowflakeへデータを取り込み、DWH・DM層を構築してBIツールで参照するまでの一連の流れをアーキテクチャとしてまとめておく。 
+そこで今回は、**Snowflakeのモダンな機能をフル活用**して**ニアリアルタイムETLを低コストで実現**する構成例を紹介します。
 
-実際に本番環境で半年以上運用している構成を基に、**つまづきポイントやパフォーマンス最適化の実体験**も含めて紹介する。
+**🔥 この記事の特徴**
+- **Snowpipe + Stream + Task** によるリアルタイムデータパイプライン
+- **VARIANT型** でスキーマレスなデータ格納
+- **3層アーキテクチャ**（Raw / DWH / DM）でデータ品質を段階的に向上
+- **冪等性・削除対応・コスト最適化** を考慮した実践的な設計
 
-## サンプルコード
+この構成はkintoneに限らず、**SaaSデータをSnowflakeで処理する際の汎用的なパターン**として活用できます。
 
-本記事で解説するSnowflakeのSQL定義やETL処理のサンプルは、以下のGitHubリポジトリで公開しています：
-
-**🔗 kintone-snowflake-dwh-sample**（予定）
-
-* Snowflakeのテーブル定義（DDL）
-* Stream/Task設定例  
-* ETL処理のPythonスクリプト
-* BIツール連携のサンプルクエリ
-
-記事と合わせてご活用ください。
+実際に本番環境で半年以上運用している構成を基に紹介します。
 
 ## 全体コンセプト
 
-今回想定するアーキテクチャは以下のポイントを重視する。
+**Snowflakeを選択した理由**は、Snowpipe + Stream + Taskの組み合わせで**ニアリアルタイムETLを低コストで実現**できることにある。従来のETLツールやストリーミング処理基盤では複雑になりがちな構成を、標準機能のみでシンプルかつ安価に構築できる。
 
-- **リアルタイム性**：数分単位でkintoneの更新がSnowflake側に反映される  
-- **スキーマ変更への柔軟性**：kintone側で新しいフィールドが追加されても、Snowflake側で対応しやすくする  
-- **冪等性**：同じ増分データを再投入しても結果がブレない構造  
-- **削除対応**：kintone上で削除されたデータをSnowflake側にも確実に反映する  
-- **コスト最適化**：必要最小限の処理で最新化・整形を行い、Snowflake上のコンピュートコストを抑える
+今回のアーキテクチャでは以下を重視している：
 
-これらを満たすため、Snowflakeを3つのレイヤー（Raw、DWH、DM）に分け、WebhookやSnowpipe、Stream、TaskといったSnowflake特有の機能をフル活用する。
+- **ニアリアルタイム性**：数分単位でkintoneの変更がSnowflake側に反映
+- **スキーマ変更への柔軟性**：VARIANT型でkintone側の項目追加に対応
+- **冪等性・削除対応**：同じデータの再投入や削除イベントを適切に処理
+
+これらを3つのレイヤー（Raw、DWH、DM）構成で実現し、ETL処理にはdbtではなくSnowflake Taskを採用している。
 
 ## 全体アーキテクチャ
 
@@ -48,7 +42,7 @@ kintoneからSnowflakeへデータを取り込み、DWH・DM層を構築してBI
 
 ```mermaid
 graph TD
-    A[kintone] -->|更新レコード| B[Lambda ETL]
+    A[kintone] -->|作成・更新レコード| B[Lambda ETL]
     A -->|削除Webhook| C[Lambda ETL]
     B -->|JSON| D[S3 Bucket]
     C -->|削除フラグ付きJSON| D
@@ -95,7 +89,7 @@ CREATE TABLE raw.kintone_deals (
 -- 外部ステージ作成
 CREATE STAGE raw.kintone_stage
 URL = 's3://your-bucket/kintone-data/'
-CREDENTIALS = (AWS_KEY_ID = 'your-key' AWS_SECRET_KEY = 'your-secret');
+STORAGE_INTEGRATION = your_s3_integration;
 
 -- Snowpipe作成
 CREATE PIPE raw.kintone_deals_pipe
@@ -137,23 +131,35 @@ CREATE TABLE dwh.deals (
 -- 自動更新Task
 CREATE TASK dwh.update_deals_task
 WAREHOUSE = 'COMPUTE_WH'
-SCHEDULE = '1 MINUTE'
+SCHEDULE = 'USING CRON 0/1 * * * * UTC'
 WHEN SYSTEM$STREAM_HAS_DATA('dwh.kintone_deals_stream')
 AS
 MERGE INTO dwh.deals t
 USING (
     SELECT 
         record_id,
-        body:deal_name::STRING as deal_name,
-        body:phase::NUMBER as phase,
-        body:client_name::STRING as client_name,
-        body:amount::NUMBER(15,2) as amount,
-        body:expected_date::DATE as expected_date,
-        body:created_at::TIMESTAMP_NTZ as created_at,
+        deal_name,
+        phase,
+        client_name,
+        amount,
+        expected_date,
+        created_at,
         updated_at,
-        is_deleted,
-        ROW_NUMBER() OVER (PARTITION BY record_id ORDER BY updated_at DESC) as rn
-    FROM dwh.kintone_deals_stream
+        is_deleted
+    FROM (
+        SELECT 
+            record_id,
+            body:deal_name::STRING as deal_name,
+            body:phase::NUMBER as phase,
+            body:client_name::STRING as client_name,
+            body:amount::NUMBER(15,2) as amount,
+            body:expected_date::DATE as expected_date,
+            body:created_at::TIMESTAMP_NTZ as created_at,
+            updated_at,
+            is_deleted,
+            ROW_NUMBER() OVER (PARTITION BY record_id ORDER BY updated_at DESC) as rn
+        FROM dwh.kintone_deals_stream
+    )
     WHERE rn = 1  -- 最新レコードのみ
 ) s ON t.record_id = s.record_id
 WHEN MATCHED AND s.is_deleted = TRUE THEN DELETE
@@ -172,67 +178,106 @@ WHEN NOT MATCHED AND s.is_deleted = FALSE THEN INSERT (
 
 -- Task開始
 ALTER TASK dwh.update_deals_task RESUME;
-```
 
 ### 4. ETL処理（Lambda関数例）
 
 ```python
 import json
 import boto3
+import os
 from datetime import datetime
 import requests
 
 def lambda_handler(event, context):
     """kintoneからの増分データを取得してS3に格納"""
     
-    # 前回実行時刻から増分取得（環境変数で管理）
+    # 前回実行時刻から増分取得（Parameter Storeから取得）
     last_updated = get_last_updated_timestamp()
     
     # kintone APIで増分データ取得
     kintone_data = fetch_incremental_data(last_updated)
+    
+    if not kintone_data:
+        return {"statusCode": 200, "message": "No new data"}
     
     # S3にJSON形式で保存
     s3_key = f"kintone-data/{datetime.now().strftime('%Y/%m/%d/%H/%M')}/deals.json"
     upload_to_s3(kintone_data, s3_key)
     
     # 次回実行用のタイムスタンプ更新
-    update_last_timestamp()
+    update_last_timestamp(datetime.now().isoformat())
     
     return {"statusCode": 200, "processed_records": len(kintone_data)}
 
 def fetch_incremental_data(since_timestamp):
-    """kintone REST APIで更新データを取得"""
+    """kintone REST APIで作成・更新データを取得"""
+    api_token = os.environ['KINTONE_API_TOKEN']
+    base_url = os.environ['KINTONE_BASE_URL']
+    app_id = os.environ['KINTONE_APP_ID']
+    
     query = f'updated_at > "{since_timestamp}"'
-    # ... kintone API呼び出し処理
-    return records
+    url = f"{base_url}/k/v1/records.json"
+    headers = {
+        'X-Cybozu-API-Token': api_token,
+        'Content-Type': 'application/json'
+    }
+    params = {'app': app_id, 'query': query}
+    
+    response = requests.get(url, headers=headers, params=params)
+    response.raise_for_status()
+    
+    return response.json().get('records', [])
+
+def upload_to_s3(data, s3_key):
+    """S3にJSONデータをアップロード"""
+    s3_client = boto3.client('s3')
+    bucket_name = os.environ['S3_BUCKET_NAME']
+    
+    # kintoneのレスポンス形式をSnowflake用に変換
+    transformed_data = []
+    for record in data:
+        transformed_record = {
+            'record_id': int(record['$id']['value']),
+            'app_id': int(os.environ['KINTONE_APP_ID']),
+            'updated_at': record['updated_at']['value'],
+            'is_deleted': False,
+            'body': {k: v['value'] for k, v in record.items() if not k.startswith('$')}
+        }
+        transformed_data.append(transformed_record)
+    
+    s3_client.put_object(
+        Bucket=bucket_name,
+        Key=s3_key,
+        Body=json.dumps(transformed_data, ensure_ascii=False, default=str),
+        ContentType='application/json'
+    )
+
+def get_last_updated_timestamp():
+    """Parameter Storeから前回実行時刻を取得"""
+    ssm = boto3.client('ssm')
+    try:
+        response = ssm.get_parameter(Name='/kintone-etl/last-updated')
+        return response['Parameter']['Value']
+    except ssm.exceptions.ParameterNotFound:
+        return '2024-01-01T00:00:00'
+
+def update_last_timestamp(timestamp):
+    """Parameter Storeに実行時刻を保存"""
+    ssm = boto3.client('ssm')
+    ssm.put_parameter(
+        Name='/kintone-etl/last-updated',
+        Value=timestamp,
+        Type='String',
+        Overwrite=True
+    )
 ```
 
 ## 運用上の重要ポイント
 
-### ⚡ パフォーマンス最適化
-
-1. **Warehouse サイズ調整**
-   ```sql
-   -- 大量データ処理時は一時的にサイズアップ
-   ALTER WAREHOUSE COMPUTE_WH SET WAREHOUSE_SIZE = 'LARGE';
-   -- 処理完了後は元に戻す
-   ALTER WAREHOUSE COMPUTE_WH SET WAREHOUSE_SIZE = 'X-SMALL';
-   ```
-
-2. **クラスタリングキー設定**
-   ```sql
-   -- よく使用される条件でクラスタリング
-   ALTER TABLE dwh.deals CLUSTER BY (updated_at, client_name);
-   ```
-
-3. **Task実行間隔の調整**
-   - 初期は1分間隔で設定したが、実運用では**5分間隔**が最適だった
-   - あまりに頻繁だとSnowflakeクレジットを無駄に消費
-
 ### 🚨 運用時の注意点
 
 1. **削除データの扱い**
-   - **物理削除は避ける**：`deleted_flag`で論理削除し、分析時にフィルタする
+   - `deleted_flag`で論理削除し、分析時にフィルタする
    - 監査要件で完全削除が必要な場合は別途バッチ処理で対応
 
 2. **スキーマ変更への対応**
@@ -249,7 +294,8 @@ def fetch_incremental_data(since_timestamp):
    -- Task実行履歴の確認
    SELECT * FROM TABLE(INFORMATION_SCHEMA.TASK_HISTORY())
    WHERE NAME = 'UPDATE_DEALS_TASK'
-   ORDER BY SCHEDULED_TIME DESC;
+   ORDER BY SCHEDULED_TIME DESC
+   LIMIT 10;
    ```
 
 ### 💰 コスト最適化の実例
@@ -258,11 +304,6 @@ def fetch_incremental_data(since_timestamp):
 - **Raw層**：1.2GB/月（履歴データ込み）
 - **DWH層**：800MB/月（最新データのみ）
 - **月間クレジット消費**：約15クレジット（＝約$45）
-
-最適化施策：
-1. AUTO_SUSPEND = 60秒に短縮
-2. 夜間バッチは別Warehouseで実行
-3. 不要なRaw層データは3ヶ月で削除
 
 ## DM層の活用例
 
@@ -302,10 +343,6 @@ FROM dwh.deals d
 WHERE d.deleted_flag = FALSE;
 ```
 
-## ARM64 (Apple Silicon) での注意
-
-ローカル開発でSnowflakeを使う場合、M1/M2 Macでは一部のPythonライブラリ（snowflake-connector-python等）で互換性問題が発生することがある。本番はx86_64環境推奨。
-
 ## まとめ
 
 本記事で紹介した構成により、kintoneデータの **リアルタイム分析基盤** を以下の特徴で実現できた：
@@ -315,9 +352,7 @@ WHERE d.deleted_flag = FALSE;
 - **信頼性**：冪等性担保で障害時も安心
 - **コスト効率**：月額$50以下で10万レコード規模を処理
 
-実運用での**つまづきポイント**や**パフォーマンス調整**の知見も含めたので、同様の要件がある方の参考になれば幸いです。
-
-特に **Task実行間隔** や **Warehouse設定** は、データ量や更新頻度に応じた調整が重要なので、段階的に最適化していくことをお勧めします！
+同様の要件がある方の参考になれば幸いです。
 
 ## 参考記事
 
