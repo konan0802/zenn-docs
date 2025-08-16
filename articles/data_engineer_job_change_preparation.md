@@ -42,7 +42,7 @@ published: false # 公開設定（falseにすると下書き）
     * [LeetCode](https://leetcode.com/)
         * [LeetCode 75](https://leetcode.com/studyplan/leetcode-75/) *※Easyのみ*
         * [Top Interview 150](https://leetcode.com/studyplan/top-interview-150/) *※Easyのみ*
-        * [SQL 50](https://leetcode.com/studyplan/top-sql-50/)
+        * [SQL 50](https://leetcode.com/studyplan/top-sql-50/) ※*Medium,Hardのみ*
 
 * 実装能力が落ちておりコーディング試験対策を行いたかった
     * 新卒採用でのコーディング試験対策から5年以上経った
