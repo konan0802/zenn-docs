@@ -87,8 +87,9 @@ published: false # 公開設定（falseにすると下書き）
 * データエンジニアはSWEと比べて求人数も少なく、また当然ながら埋まったらクローズされるので、いざ選考活動進めようとしたらクローズしていた企業もあり、本当に出会いだなと思った。
 
 ## 参考
-* [無職がメガベンチャーに内定するまで](https://zenn.dev/shinonome81/articles/3e3f975e88f8cb)
 * [@gaijineers](https://x.com/gaijineers)
     * [今から年収の高いソフトウェアエンジニアを目指すなら、](https://x.com/gaijineers/status/1956636567403102569)
-* [転職活動の記録](https://y-nishizawa.hatenablog.com/entry/2024/09/27/121334)
 * [2024年におけるソフトウェアエンジニアの就職戦略](https://note.com/gaijineers/n/ndfdc65d300a2)
+* [無職がメガベンチャーに内定するまで](https://zenn.dev/shinonome81/articles/3e3f975e88f8cb)
+* [転職活動の記録](https://y-nishizawa.hatenablog.com/entry/2024/09/27/121334)
+* [転職活動2025](https://note.com/tttol777/n/n790ba5eff15f)
