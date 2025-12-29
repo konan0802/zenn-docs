@@ -9,7 +9,10 @@ published: false
 ---
 
 ## はじめに
-[AWS DEA (AWS Certified Data Engineer - Associate) 合格までにやったこと](https://zenn.dev/konan/articles/3bf26e16d4188b)、[Snowflake SnowPro Core 合格までにやったこと](https://zenn.dev/konan/articles/0d8aee638348f8)に続いて、Google Cloud Professional Data Engineer (PDE)も合格したのでレポを書く！
+- [AWS DEA (AWS Certified Data Engineer - Associate) 合格までにやったこと](https://zenn.dev/konan/articles/3bf26e16d4188b)
+- [Snowflake SnowPro Core 合格までにやったこと](https://zenn.dev/konan/articles/0d8aee638348f8)
+
+に続いて、[Google Cloud Professional Data Engineer](https://cloud.google.com/learn/certification/data-engineer)も合格したのでレポを書く！
 
 ## PDE試験の概要
 * 試験時間：120分
@@ -32,11 +35,8 @@ published: false
 後半は5回の模擬試験でアウトプットを中心に知識の深堀りを行った。
 
 ## 勉強時間
-勉強時間としては
-・前半：4時間
-・後半：20時間（4時間×5模擬試験）
-
-期間としては1週間ぐらい
+勉強時間としては20時間（4時間×5模擬試験）ぐらい
+期間としては、2週間（平日2時間＆休日5時間）ぐらい
 
 ## 使用した教材
 
@@ -47,7 +47,7 @@ published: false
 | 模擬試験② | 85% | 95% | 
 
 - 比較的に短時間で試験範囲の全体像を把握できるので教材としては良かった
-- しかしあくまでも全体像でありこの内容を完璧にできたとしても合格確実とは言えない内容
+- しかしあくまでも全体像でありこの内容を完璧にできたとしても合格確実とは言えない
 
 #### [【最短攻略】Google Cloud 認定 Professional Data Engineer 模擬問題集](https://www.udemy.com/course/google-cloud-professional-data-engineer-s/)
 |  | 1回目 | 2回目 |
@@ -58,16 +58,16 @@ published: false
 
 - 意味不明な問題や回答が誤っている問題がそこそこ存在した。質の悪いモデルで作成したのかな
 - また試験改訂から1年以上経っていたにもかかわらずの以前の学習要項のままだった
-- かなり欠陥品ではあるものの問題演習量を増やすという点ではギリギリ使える教材だった
+- かなり欠陥品ではあるものの、問題演習量を増やすという点ではギリギリ使える教材だった
 
 #### [【Professional Data Engineer】試験直前対策！これだけは覚えておこう！ プラス 5 点で合格を勝ち取る！](https://cloud-ace.jp/column/detail473/)
 - 上記の2つの教材が試験改定に対応し切れていなかったので、補強教材として熟読した
-- 確かにこの資料のおかげでプラス5点は取れたと思うので非常に助かった
+- この資料のおかげでプラス5点以上は点数が上がったと思うので非常に助かった
 
 ## 結果
-![](https://storage.googleapis.com/zenn-user-upload/4eef6b2e7025-20251229.png)
-* 結果は無事に合格！得点は記載されていなかった？？
-* しかし全然対策できていなかった種類の問題もあり合格点的にはギリギリな気がする、、
+![](https://storage.googleapis.com/zenn-user-upload/4eef6b2e7025-20251229.png =250x)
+* 結果は無事に合格！得点はどこにも記載されていなかった気がする
+* 対策問題と傾向が異なる問題ばかりでギリギリでの合格な気がする、、
 
 ## 感想
 * この試験は難しかったというより良い勉強リソースがない、、
