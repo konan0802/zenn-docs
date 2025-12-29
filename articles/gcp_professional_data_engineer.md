@@ -5,7 +5,7 @@ type: "idea"
 topics:
   - "dataengineering"
   - "gcp認定"
-published: false
+published: true
 ---
 
 ## はじめに
