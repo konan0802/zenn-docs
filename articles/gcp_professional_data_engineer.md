@@ -12,7 +12,7 @@ published: false
 - [AWS DEA (AWS Certified Data Engineer - Associate) 合格までにやったこと](https://zenn.dev/konan/articles/3bf26e16d4188b)
 - [Snowflake SnowPro Core 合格までにやったこと](https://zenn.dev/konan/articles/0d8aee638348f8)
 
-に続いて、[Google Cloud Professional Data Engineer](https://cloud.google.com/learn/certification/data-engineer)も合格したのでレポを書く！
+に続いて、[Google Cloud Professional Data Engineer](https://cloud.google.com/learn/certification/data-engineer) も合格したのでレポを書く！
 
 ## PDE試験の概要
 * 試験時間：120分
@@ -66,9 +66,10 @@ published: false
 
 ## 結果
 ![](https://storage.googleapis.com/zenn-user-upload/4eef6b2e7025-20251229.png =250x)
-* 結果は無事に合格！得点はどこにも記載されていなかった気がする
+* 結果は無事に合格！得点はどこにも記載されていなかった、、
 * 対策問題と傾向が異なる問題ばかりでギリギリでの合格な気がする、、
 
 ## 感想
-* この試験は難しかったというより良い勉強リソースがない、、
-* そこそこのデータエンジニア経験がありつつ、上記の模擬試験での正答率を95%以上に持っていくとギリギリ受かるかな？
+* この試験は難しかったというより良い教材がなかったな、、
+* データエンジニアリング経験に助けられた問題もあったので教材だけだと受かったかどうか
+* データエンジニア経験がなければ上記の模擬試験をほぼ完璧に正答できるようになってギリギリ受かるかどうか。という感じ
